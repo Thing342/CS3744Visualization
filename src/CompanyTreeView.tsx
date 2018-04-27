@@ -19,7 +19,7 @@ const containerStyles = {
     width: '100%',
 };
 
-const factor = 200;
+const factor = 225;
 
 const sep = {
     nonSiblings: 0.4,

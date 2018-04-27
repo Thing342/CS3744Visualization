@@ -5,7 +5,8 @@ export interface ICompanyAddFormResult {
 }
 
 export interface ICompanyAddFormState {
-    formcontent: string
+    formcontent: string,
+    isvalid: boolean
 }
 
 export interface ICompanyAddFormProps {
@@ -16,7 +17,7 @@ class CompanyAddForm extends React.Component<ICompanyAddFormProps, ICompanyAddFo
     public constructor(props: ICompanyAddFormProps) {
         super(props);
 
-        this.state = { formcontent: "" };
+        this.state = { formcontent: "", isvalid: false };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -24,24 +25,30 @@ class CompanyAddForm extends React.Component<ICompanyAddFormProps, ICompanyAddFo
 
     public handleChange(event: React.FormEvent<HTMLInputElement>) {
         if(event.target) {
-            this.setState({formcontent: event.currentTarget.value})
+            const val: string = event.currentTarget.value;
+            this.setState({formcontent: val, isvalid: /\S/.test(val)})
         }
     }
 
     public handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const companyName = this.state.formcontent;
 
-        this.props.onSubmit({companyName});
+        if (this.state.isvalid) {
+            const companyName = this.state.formcontent;
+            this.props.onSubmit({companyName});
+            this.setState({ formcontent: "", isvalid: false });
+        } else {
+            alert('Name field cannot be empty!');
+        }
     }
 
     public render() {
         return (
-            <form onSubmit={this.handleSubmit}>
+            <form onSubmit={this.handleSubmit} className={'my-4'}>
                 <label>
                     Name:
                     <input type="text" className={'form-control'} placeholder={'Company Name'}
-                           value={this.state.formcontent} onChange={this.handleChange} />
+                           value={this.state.formcontent} onChange={this.handleChange}  />
                 </label>
                 <input type="submit" className={'btn btn-primary'} value="Submit" />
             </form>
