@@ -4,10 +4,10 @@ import CompanyAddForm, {ICompanyAddFormResult} from "./CompanyAddForm";
 import {IDict, IUnit, UnitID, UserLevel, USERLEVEL_EDITOR} from "./types";
 
 export interface ICompanyDetailViewProps {
-    unit: IUnit,
+    unit: IUnit | null,
     units: IDict<IUnit>,
-    onUnitCreate: (newunit: IUnit, superunitId: UnitID) => void
-    onUnitDelete: (unitToDelete: IUnit, superUnitID: UnitID) => void
+    onUnitCreate: (newunit: IUnit) => void
+    onUnitDelete: (unitToDelete: IUnit) => void
     userlevel: UserLevel
     backend: string
 }
@@ -23,18 +23,21 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
     }
 
     public onCompanyAdd(res: ICompanyAddFormResult): void {
-        const newcompany: IUnit = {
-            id: -999,
-            name: res.companyName,
-            subunitIDs: []
-        };
+        if(this.props.unit) {
+            const newcompany: IUnit = {
+                id: -999,
+                name: res.companyName,
+                subunitIDs: [],
+                unitParentID: this.props.unit.id
+            };
 
-        this.props.onUnitCreate(newcompany, this.props.unit.id);
+            this.props.onUnitCreate(newcompany);
+        }
     }
 
     public onCompanyDelete(id: UnitID): void {
         if(confirm("Really delete this unit?")) {
-            this.props.onUnitDelete(this.props.units[id], this.props.unit.id);
+            this.props.onUnitDelete(this.props.units[id]);
         }
     }
 
@@ -57,10 +60,10 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
     public render() {
         const {unit, units} = this.props;
 
-        const subunits = unit.subunitIDs.map(x => units[x]);
-        const linkURL = this.props.backend + '/companies/' + this.props.unit.id;
-
         if(unit) {
+            const subunits = unit.subunitIDs.map(x => units[x]);
+            const linkURL = this.props.backend + '/companies/' + unit.id;
+
             return (
                 <div className={'px-4'} style={{maxHeight: '600px', overflow: 'auto'}}>
                     <h3>{unit.name}</h3>

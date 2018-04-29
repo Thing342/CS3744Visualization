@@ -6,14 +6,12 @@ import AlertBoxView from "./AlertBoxView";
 import CompanyDetailView from "./CompanyDetailView";
 import CompanyTreeView from "./CompanyTreeView";
 import * as backend from "./http";
-import {sampleData} from "./sample";
 import {AlertType, IDict, IUnit, UnitID, UserLevel} from "./types";
-import {getRandomInt} from "./util";
 
 
 interface IAppState {
     units: IDict<IUnit>,
-    selected: IUnit,
+    selected: IUnit | null,
 }
 
 interface IAppProps {
@@ -27,7 +25,7 @@ class App extends React.Component<IAppProps, IAppState> {
     public constructor(props: IAppProps) {
         super(props);
 
-        this.state = {units: sampleData, selected: sampleData['-1']};
+        this.state = {units: {}, selected: null};
 
         this.selectUnit = this.selectUnit.bind(this);
         this.handleUnitCreate = this.handleUnitCreate.bind(this);
@@ -65,9 +63,8 @@ class App extends React.Component<IAppProps, IAppState> {
         );
     }
 
-    public handleUnitCreate(unit: IUnit, superUnitId: UnitID) {
-        // TODO: Replace with proper HTTP logic, until then ...
-
+    public async handleUnitCreate(unit: IUnit) {
+        /*
         unit.id = getRandomInt(10000);
 
         const newState = Object.assign({}, this.state);
@@ -75,27 +72,64 @@ class App extends React.Component<IAppProps, IAppState> {
         newState.units[superUnitId].subunitIDs.push(unit.id);
 
         this.setState(newState);
+        */
+        let dict: IDict<IUnit>;
+        let id: UnitID;
+        try {
+            const res = await backend.create(this.props.backend, unit);
+            dict = res.value;
+            id = res.resourceID;
+        } catch (error) {
+            console.error(error);
+            alert("Error during update fetch. Check dev console.");
+            dict = this.state.units;
+            id= -1;
+        }
+
+        console.log(dict);
+
+        this.setState({
+            selected: dict[id],
+            units: dict
+        });
 
         this.alertBox.pushAlert({
             level: AlertType.SUCCESS,
             linkText: "View Unit Page",
-            linkURL: "#",
+            linkURL: this.props.backend + '/companies/' + id,
             message: unit.name + " successfully created."
         })
     }
 
-    public handleUnitDelete(unit: IUnit, superUnitId: UnitID) {
-        // TODO: Replace with proper HTTP logic, until then ...
-
+    public async handleUnitDelete(unit: IUnit) {
+        /*
         const newState = Object.assign({}, this.state);
-        const parentSubs = newState.units[superUnitId].subunitIDs;
+        const parentSubs = newState.units[unit.unitParentID].subunitIDs;
 
-        newState.units[superUnitId].subunitIDs = parentSubs.filter((x: UnitID) => x !== unit.id);
+        newState.units[unit.unitParentID].subunitIDs = parentSubs.filter((x: UnitID) => x !== unit.id);
         delete newState.units[unit.id];
 
         console.log(newState);
 
         this.setState(newState);
+        */
+
+        let dict: IDict<IUnit>;
+        try {
+            const res = await backend.remove(this.props.backend, unit.id);
+            dict = res.value;
+        } catch (error) {
+            console.error(error);
+            alert("Error during update fetch. Check dev console.");
+            dict = this.state.units;
+        }
+
+        console.log(dict);
+
+        this.setState({
+            selected: dict[-1],
+            units: dict
+        });
 
         this.alertBox.pushAlert({
             level: AlertType.SUCCESS,
@@ -106,7 +140,14 @@ class App extends React.Component<IAppProps, IAppState> {
     }
 
     private async fetchInitial() {
-        const dict = await backend.read(this.props.backend);
+        let dict: IDict<IUnit>;
+        try {
+            dict = await backend.read(this.props.backend);
+        } catch (error) {
+            console.error(error);
+            alert("Error during initial fetch. Check dev console.");
+            dict = {};
+        }
 
         console.log(dict);
 

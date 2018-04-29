@@ -43,14 +43,25 @@ class AlertBoxView extends React.Component<{}, IAlertBoxViewState> {
         const classname = "alert alert-dismissable " + alert.level;
         const dismiss = () => this.onDismiss(key);
 
+        let links = null;
+        if(alert.linkText && alert.linkURL) {
+            links = (
+                <p className="mb-0"><a className={'alert-link'} href={alert.linkURL}>{alert.linkText}</a></p>
+            )
+        } else if (alert.linkText) {
+            links = (
+                <p className="mb-0">{alert.linkText}</p>
+            )
+        }
+
         return (
             <div className={classname} role={'alert'} key={key}>
                 <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={dismiss}>
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <p>{alert.message}</p>
-                <hr/>
-                <p className="mb-0"><a className={'alert-link'} href={alert.linkURL}>{alert.linkText}</a></p>
+                {(links) ? <hr/> : null}
+                {links}
             </div>
         )
     }

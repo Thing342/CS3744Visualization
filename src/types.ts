@@ -16,7 +16,8 @@ export function dictMap<V, O>(dict: IDict<V>, fn: (key: number, val: V) => O) {
 export interface IUnit {
     id: UnitID,
     name: string,
-    subunitIDs: UnitID[]
+    subunitIDs: UnitID[],
+    unitParentID: UnitID
 }
 
 
@@ -28,12 +29,20 @@ export interface ITreeNode {
 
 export function constructTree(units: IDict<IUnit>, rootID: UnitID) : ITreeNode {
     const unit = units[rootID];
-    return {
-        attributes: {
-            id: rootID
-        },
-        children: unit.subunitIDs.map(x => constructTree(units, x)),
-        name: unit.name
+    if(unit) {
+        return {
+            attributes: {
+                id: rootID
+            },
+            children: unit.subunitIDs.map(x => constructTree(units, x)),
+            name: unit.name
+        }
+    } else {
+        return {
+            attributes: {},
+            children: [],
+            name: "No data"
+        }
     }
 }
 
@@ -48,8 +57,8 @@ export enum AlertType {
 export interface IAlert {
     level: AlertType,
     message: string,
-    linkText: string,
-    linkURL: string
+    linkText: string | null,
+    linkURL: string | null
 }
 
 
