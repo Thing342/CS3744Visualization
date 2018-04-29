@@ -23,7 +23,26 @@ const factor = 225;
 
 const sep = {
     nonSiblings: 0.4,
-    siblings: 0.25,
+    siblings: 0.3,
+};
+
+const textLayout = {
+    textAnchor: "start",
+    transform: "rotate(0 0,0)",
+    x: 15,
+    y: -10,
+};
+
+const shape = {
+    shape: 'rect',
+    shapeProps: {
+        height: '20',
+        rx: '5',
+        ry: '5',
+        width: '20',
+        x: '-10',
+        y: '-10',
+    }
 };
 
 class CompanyTreeView extends React.Component<ICompanyTreeViewProps, ICompanyTreeViewState> {
@@ -80,6 +99,8 @@ class CompanyTreeView extends React.Component<ICompanyTreeViewProps, ICompanyTre
                       initialDepth={1}
                       zoom={0.75}
                       onClick={this.onUnitClicked}
+                      textLayout={textLayout}
+                      nodeSvgShape={shape}
                       depthFactor={factor}/>
             </div>
         )

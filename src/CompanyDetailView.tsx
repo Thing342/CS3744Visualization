@@ -50,7 +50,7 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
         ) : (null) ;
 
         return (
-            <li className={'list-group-item list-group-item-action'} key={subunit.id}>
+            <li className={'list-group-item'} key={subunit.id}>
                 {subunit.name}
                 {button}
             </li>
@@ -63,11 +63,15 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
         if(unit) {
             const subunits = unit.subunitIDs.map(x => units[x]);
             const linkURL = this.props.backend + '/companies/' + unit.id;
+            const photoURL = this.props.backend + '/uploads/images/companies/' + unit.id + '.jpg';
 
             return (
                 <div className={'px-4'} style={{maxHeight: '600px', overflow: 'auto'}}>
                     <h3>{unit.name}</h3>
                     <hr/>
+                    <div>
+                        <img className={"align-self-center img-fluid"} src={photoURL} />
+                    </div>
                     <a href={linkURL} className="my-2 btn btn-primary">View company page</a>
                     <h4>Subunits:</h4>
                     <ul className={'list-unstyled'}>
