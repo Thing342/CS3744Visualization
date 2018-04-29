@@ -5,8 +5,9 @@ import './App.css';
 import AlertBoxView from "./AlertBoxView";
 import CompanyDetailView from "./CompanyDetailView";
 import CompanyTreeView from "./CompanyTreeView";
+import * as backend from "./http";
 import {sampleData} from "./sample";
-import {AlertType, IDict, IUnit, UnitID} from "./types";
+import {AlertType, IDict, IUnit, UnitID, UserLevel} from "./types";
 import {getRandomInt} from "./util";
 
 
@@ -15,10 +16,15 @@ interface IAppState {
     selected: IUnit,
 }
 
-class App extends React.Component<{}, IAppState> {
+interface IAppProps {
+    backend: string,
+    userlevel: UserLevel
+}
+
+class App extends React.Component<IAppProps, IAppState> {
     public alertBox: AlertBoxView;
 
-    public constructor(props: {}) {
+    public constructor(props: IAppProps) {
         super(props);
 
         this.state = {units: sampleData, selected: sampleData['-1']};
@@ -30,6 +36,10 @@ class App extends React.Component<{}, IAppState> {
 
     public selectUnit(unit: IUnit, event: Event): void {
         this.setState({...this.state, selected: unit});
+    }
+
+    public componentDidMount() {
+        this.fetchInitial();
     }
 
     public render() {
@@ -46,6 +56,8 @@ class App extends React.Component<{}, IAppState> {
                             unit={this.state.selected}
                             onUnitCreate={this.handleUnitCreate}
                             onUnitDelete={this.handleUnitDelete}
+                            userlevel={this.props.userlevel}
+                            backend={this.props.backend}
                         />
                     </div>
                 </div>
@@ -90,6 +102,17 @@ class App extends React.Component<{}, IAppState> {
             linkText: "Link",
             linkURL: "#",
             message: unit.name + " successfully deleted."
+        })
+    }
+
+    private async fetchInitial() {
+        const dict = await backend.read(this.props.backend);
+
+        console.log(dict);
+
+        this.setState({
+            selected: dict[-1],
+            units: dict
         })
     }
 }

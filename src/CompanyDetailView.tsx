@@ -1,13 +1,15 @@
 import * as React from 'react';
 
 import CompanyAddForm, {ICompanyAddFormResult} from "./CompanyAddForm";
-import {IDict, IUnit, UnitID} from "./types";
+import {IDict, IUnit, UnitID, UserLevel, USERLEVEL_EDITOR} from "./types";
 
 export interface ICompanyDetailViewProps {
     unit: IUnit,
     units: IDict<IUnit>,
     onUnitCreate: (newunit: IUnit, superunitId: UnitID) => void
     onUnitDelete: (unitToDelete: IUnit, superUnitID: UnitID) => void
+    userlevel: UserLevel
+    backend: string
 }
 
 class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
@@ -38,12 +40,16 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
 
     public subunitListItem(subunit: IUnit) {
         const onClick = () => this.onCompanyDelete(subunit.id);
+        const button = (this.props.userlevel >= USERLEVEL_EDITOR) ? (
+            <button type="button" className={'close'} aria-label="Close" onClick={onClick}>
+                <span aria-hidden="true">&times;</span>
+            </button>
+        ) : (null) ;
+
         return (
             <li className={'list-group-item list-group-item-action'} key={subunit.id}>
                 {subunit.name}
-                <button type="button" className={'close'} aria-label="Close" onClick={onClick}>
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                {button}
             </li>
         )
     }
@@ -52,19 +58,22 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
         const {unit, units} = this.props;
 
         const subunits = unit.subunitIDs.map(x => units[x]);
+        const linkURL = this.props.backend + '/companies/' + this.props.unit.id;
 
         if(unit) {
             return (
                 <div className={'px-4'} style={{maxHeight: '600px', overflow: 'auto'}}>
                     <h3>{unit.name}</h3>
                     <hr/>
-                    <a href="#" className="my-2 btn btn-primary">View company page</a>
+                    <a href={linkURL} className="my-2 btn btn-primary">View company page</a>
                     <h4>Subunits:</h4>
                     <ul className={'list-unstyled'}>
-                        {subunits.map(this.subunitListItem)}
+                        {(subunits.length !== 0) ? subunits.map(this.subunitListItem) : <li>No subunits.</li>}
                     </ul>
                     <h4>Add Subunit:</h4>
-                    <CompanyAddForm onSubmit={this.onCompanyAdd}/>
+                    {(this.props.userlevel >= USERLEVEL_EDITOR) ?
+                        <CompanyAddForm onSubmit={this.onCompanyAdd}/>
+                        : <i>Log in to edit units.</i>}
                 </div>
             )
         } else {

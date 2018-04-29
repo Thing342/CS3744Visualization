@@ -51,3 +51,10 @@ export interface IAlert {
     linkText: string,
     linkURL: string
 }
+
+
+export type UserLevel = number;
+export const USERLEVEL_ADMIN: UserLevel     = 3;
+export const USERLEVEL_EDITOR: UserLevel    = 2;
+export const USERLEVEL_COMMENTOR: UserLevel = 1;
+export const USERLEVEL_ANYONE: UserLevel    = 0;

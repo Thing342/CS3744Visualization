@@ -7,8 +7,13 @@ import App from './App';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
+/* tslint:disable:no-string-literal */
 ReactDOM.render(
-  <App />,
+  <App backend={window['backend']} userlevel={window['userlevel']} />,
   document.getElementById('root') as HTMLElement
 );
+
+console.log(window['backend']);
+/* tslint:enable:no-string-literal */
+
 registerServiceWorker();
