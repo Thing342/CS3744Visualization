@@ -19,6 +19,17 @@ interface IAppProps {
     userlevel: UserLevel
 }
 
+/**
+ * Top-level application component for managing layout and internal state.
+ * @author Wes Jordan, Copyright 2018.
+ *
+ * State:
+ *  - units: Dictionary mapping unit ID to unit objects
+ *  - selected: The currently displayed IUnit.
+ * Props:
+ *  - backend: String pointing to the API backend
+ *  - userlevel: The current user's level
+ */
 class App extends React.Component<IAppProps, IAppState> {
     public alertBox: AlertBoxView;
 
@@ -27,19 +38,31 @@ class App extends React.Component<IAppProps, IAppState> {
 
         this.state = {units: {}, selected: null};
 
+        // Bind functions b/c JS is dumb
         this.selectUnit = this.selectUnit.bind(this);
         this.handleUnitCreate = this.handleUnitCreate.bind(this);
         this.handleUnitDelete = this.handleUnitDelete.bind(this);
     }
 
+    /**
+     * Handles the CompanyTreeView's onUnitClicked event
+     * @param {IUnit} unit - the unit selected
+     * @param {Event} event - the event object
+     */
     public selectUnit(unit: IUnit, event: Event): void {
         this.setState({...this.state, selected: unit});
     }
 
+    /**
+     * Runs initial fetch when component is mounted
+     */
     public componentDidMount() {
         this.fetchInitial();
     }
 
+    /**
+     * Renders component
+     */
     public render() {
         return (
             <div>
@@ -63,16 +86,12 @@ class App extends React.Component<IAppProps, IAppState> {
         );
     }
 
+    /**
+     * Asynchronous method to handle adding a unit
+     * @param {IUnit} unit - Unit object to upload to server
+     */
     public async handleUnitCreate(unit: IUnit) {
-        /*
-        unit.id = getRandomInt(10000);
-
-        const newState = Object.assign({}, this.state);
-        newState.units[unit.id] = unit;
-        newState.units[superUnitId].subunitIDs.push(unit.id);
-
-        this.setState(newState);
-        */
+        // try http request
         let dict: IDict<IUnit>;
         let id: UnitID;
         try {
@@ -82,12 +101,13 @@ class App extends React.Component<IAppProps, IAppState> {
         } catch (error) {
             console.error(error);
             alert("Error during update fetch. Check dev console.");
-            dict = this.state.units;
+            dict = this.state.units; // fall back to old state on failure
             id= -1;
         }
 
         console.log(dict);
 
+        // update with new state and push new alert
         this.setState({
             selected: dict[id],
             units: dict
@@ -101,19 +121,12 @@ class App extends React.Component<IAppProps, IAppState> {
         })
     }
 
+    /**
+     * Asynchronous method to handle deleting a unit
+     * @param {IUnit} unit - Unit object to delete from server
+     */
     public async handleUnitDelete(unit: IUnit) {
-        /*
-        const newState = Object.assign({}, this.state);
-        const parentSubs = newState.units[unit.unitParentID].subunitIDs;
-
-        newState.units[unit.unitParentID].subunitIDs = parentSubs.filter((x: UnitID) => x !== unit.id);
-        delete newState.units[unit.id];
-
-        console.log(newState);
-
-        this.setState(newState);
-        */
-
+        // try http request
         let dict: IDict<IUnit>;
         try {
             const res = await backend.remove(this.props.backend, unit.id);
@@ -121,11 +134,12 @@ class App extends React.Component<IAppProps, IAppState> {
         } catch (error) {
             console.error(error);
             alert("Error during update fetch. Check dev console.");
-            dict = this.state.units;
+            dict = this.state.units; // fall back to old state on failure
         }
 
         console.log(dict);
 
+        // update with new state and push new alert
         this.setState({
             selected: dict[-1],
             units: dict
@@ -139,7 +153,11 @@ class App extends React.Component<IAppProps, IAppState> {
         })
     }
 
+    /**
+     * Asynchronous method to run initial data fetch
+     */
     private async fetchInitial() {
+        // try http request
         let dict: IDict<IUnit>;
         try {
             dict = await backend.read(this.props.backend);
@@ -151,6 +169,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
         console.log(dict);
 
+        // Update with new state
         this.setState({
             selected: dict[-1],
             units: dict

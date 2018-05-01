@@ -6,6 +6,15 @@ export interface IAlertBoxViewState  {
     undismissed: IDict<IAlert>
 }
 
+/**
+ * Displays a dismissible list of IAlerts.
+ * @author Wes Jordan, Copyright 2018.
+ *
+ * Props:
+ *  - none
+ * State:
+ *  - undismissed: The alerts collection; a dictionary mapping a unique but arbitrary ID to an IAlert.
+ */
 class AlertBoxView extends React.Component<{}, IAlertBoxViewState> {
     public constructor(props: {}) {
         super(props);
@@ -16,6 +25,10 @@ class AlertBoxView extends React.Component<{}, IAlertBoxViewState> {
         this.onDismiss = this.onDismiss.bind(this);
     }
 
+    /**
+     * Handle dismiss button press by closing affected event
+     * @param {number} key - The ID of the button to close
+     */
     public onDismiss(key: number) {
         const newState = {...this.state};
         delete newState.undismissed[key];
@@ -23,14 +36,22 @@ class AlertBoxView extends React.Component<{}, IAlertBoxViewState> {
         this.setState(newState);
     }
 
+    /**
+     * Push a new IAlert into the alerts queue. Assigns the alert an arbitrary ID and updates state.
+     * @param {IAlert} alert - The IAlert to push.
+     */
     public pushAlert(alert: IAlert) {
-        const newKey = getRandomInt(10000);
+        const newKey = getRandomInt(10000); // Assign ID
         const undismissed = {...this.state.undismissed};
         undismissed[newKey] = alert;
 
         this.setState({undismissed});
     }
 
+    /**
+     * Renders the component.
+     * @return JSX
+     */
     public render() {
         return (
             <div className={'mb-4'}>
@@ -39,6 +60,12 @@ class AlertBoxView extends React.Component<{}, IAlertBoxViewState> {
         )
     }
 
+    /**
+     * Render a single alert.
+     * @param {number} key - the key for the alert
+     * @param {IAlert} alert - the alert to render
+     * @returns {any} - JSX
+     */
     public renderAlert(key: number, alert: IAlert) {
         const classname = "alert alert-dismissable " + alert.level;
         const dismiss = () => this.onDismiss(key);

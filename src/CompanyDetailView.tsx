@@ -12,6 +12,18 @@ export interface ICompanyDetailViewProps {
     backend: string
 }
 
+/**
+ * Displays information about the selected company.
+ * @author Wes Jordan, Copyright 2018.
+ *
+ * Props:
+ *  - unit: the unit to display
+ *  - units: global dictionary of units
+ *  - onUnitCreate: callback to handle when a unit is created
+ *  - onUnitDelete: callback to handle when a unit is deleted
+ *  - userlevel: the user's current level
+ *  - backend: string pointing to the site backend root
+ */
 class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
 
     public constructor(props: ICompanyDetailViewProps) {
@@ -22,8 +34,13 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
         this.subunitListItem = this.subunitListItem.bind(this);
     }
 
+    /**
+     * Handles add form's callback method and dispatches onUnitCreate
+     * @param {ICompanyAddFormResult} res - add form results object
+     */
     public onCompanyAdd(res: ICompanyAddFormResult): void {
         if(this.props.unit) {
+            // wrap result in unit object before dispatch
             const newcompany: IUnit = {
                 id: -999,
                 name: res.companyName,
@@ -35,12 +52,20 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
         }
     }
 
+    /**
+     * Handles delete button press and dispatches onUnitDelete
+     * @param {UnitID} id - id of unit to delete
+     */
     public onCompanyDelete(id: UnitID): void {
         if(confirm("Really delete this unit?")) {
             this.props.onUnitDelete(this.props.units[id]);
         }
     }
 
+    /**
+     * Renders a list item for a subunit
+     * @param {IUnit} subunit - IUnit object to render
+     */
     public subunitListItem(subunit: IUnit) {
         const onClick = () => this.onCompanyDelete(subunit.id);
         const button = (this.props.userlevel >= USERLEVEL_EDITOR) ? (
@@ -57,6 +82,9 @@ class CompanyDetailView extends React.Component<ICompanyDetailViewProps, {}> {
         )
     }
 
+    /**
+     * Renders components
+     */
     public render() {
         const {unit, units} = this.props;
 

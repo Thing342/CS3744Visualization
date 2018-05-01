@@ -1,17 +1,21 @@
+/**
+ * Contains functions dealing with API data
+ * @author Wes Jordan, Copyright 2018.
+ */
 import axios from 'axios';
 import {IDict, IUnit, UnitID} from "./types";
 
 export type Fetch = IDict<IUnit>;
 
 export interface IAPISuccess<T> {
-    resourceID: UnitID,
-    result: string,
-    value: T,
+    resourceID: UnitID, // The ID of the returned resource
+    result: string, // "success"
+    value: T, // The actual payload
 }
 
 export interface IAPIFailure {
-    result: string,
-    error: string
+    result: string, // "failure"
+    error: string // The cause of the error, this should be throw
 }
 
 export type APIResult<T> = IAPISuccess<T> | IAPIFailure;
