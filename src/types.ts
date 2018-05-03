@@ -1,7 +1,7 @@
 /**
  * Contains common info on types used through application.
  * @author Wes Jordan, Copyright 2018.
- **/
+ */
 
 /**
  * Type alias for an integer dictionary, mapping to the specified type.
@@ -37,7 +37,7 @@ export function dictMap<V, O>(dict: IDict<V>, fn: (key: number, val: V) => O) {
     return Object.keys(dict).map((k) => fn(parseInt(k, 10), dict[k]));
 }
 
-//----
+// ----
 
 export type UnitID = number;
 
@@ -51,7 +51,7 @@ export interface IUnit {
     unitParentID: UnitID // The ID of this unit's parent.
 }
 
-//----
+// ----
 
 /**
  * Kludge type for the react-d3-tree node type
@@ -87,7 +87,7 @@ export function constructTree(units: IDict<IUnit>, rootID: UnitID) : ITreeNode {
     }
 }
 
-//----
+// ----
 
 export enum AlertType {
     SUCCESS = "alert-success",
